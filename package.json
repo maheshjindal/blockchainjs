@@ -1,0 +1,19 @@
+{
+  "name": "blockchain",
+  "version": "1.0.0",
+  "description": "Creating Blockchain in js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maheshjindal/blockchainjs.git"
+  },
+  "author": "maheshjindal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maheshjindal/blockchainjs/issues"
+  },
+  "homepage": "https://github.com/maheshjindal/blockchainjs#readme"
+}
