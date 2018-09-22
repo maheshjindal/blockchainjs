@@ -4,6 +4,7 @@ class Blockchain {
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
+    this.createNewBlock(100,'0','0');
   }
   createNewBlock(nonce, previousBlockHash, hash) {
     const newBlock = {
@@ -29,12 +30,21 @@ class Blockchain {
     return this.getLastBlock["index"]+1;
   }
 
-  hashBlock(previousBlockData, currentBlockData, nonce) {
-    const newDataString = previousBlockData+nonce.toString()+JSON.stringify(currentBlockData);
+  hashBlock(previousBlockHash, currentBlockData, nonce) {
+    const newDataString = previousBlockHash+nonce.toString()+JSON.stringify(currentBlockData);
     const hash = sha256(newDataString);
     return hash;
   }
-
+  proofOfWork(previousBlockHash, currentBlockData) {
+    let nonce = 0;
+    let hash = this.hashBlock(previousBlockHash,currentBlockData, nonce);
+    while(hash.substring(0,4) !== '0000'){
+      nonce++;
+      hash = this.hashBlock(previousBlockHash,currentBlockData, nonce)
+      console.log(`Hash at nonce ${nonce} is ${hash}`);
+    }
+    return nonce;
+  }
   getLastBlock() {
     return this.chain[this.chain.length - 1]
   }
