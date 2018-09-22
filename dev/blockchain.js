@@ -19,7 +19,9 @@ class Blockchain {
       this.chain.push(newBlock);
       return newBlock;
   }
-
+  getLastBlock() {
+    return this.chain[this.chain.length - 1]
+  }
   createNewTransaction(amount, sender, recipient) {
     const newTransaction = {
       amount: amount,
@@ -27,7 +29,7 @@ class Blockchain {
       recipient: recipient
     };
     this.pendingTransactions.push(newTransaction);
-    return this.getLastBlock["index"]+1;
+    return (this.getLastBlock()["index"]+1);
   }
 
   hashBlock(previousBlockHash, currentBlockData, nonce) {
@@ -45,9 +47,7 @@ class Blockchain {
     }
     return nonce;
   }
-  getLastBlock() {
-    return this.chain[this.chain.length - 1]
-  }
+
 }
 
 module.exports = Blockchain;
