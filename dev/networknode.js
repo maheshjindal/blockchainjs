@@ -1,3 +1,12 @@
+/**
+*author: @maheshjindal
+*
+*
+*
+*
+**/
+
+
 const express = require('express');
 const Blockchain = require('./blockchain.js');
 const bodyParser = require('body-parser');
@@ -55,17 +64,64 @@ app.get('/mine',(req,res) => {
     transactions: bitcoin.pendingTransactions,
     index: lastBlock['index'] + 1
   };
+  bitcoin.createNewTransaction(12.5,"00",nodeAddress);
   const nonce = bitcoin.proofOfWork(prevBlockHash,currBlockData);
   const blockHash = bitcoin.hashBlock(prevBlockHash,currBlockData,nonce);
   const newblock = bitcoin.createNewBlock(nonce,prevBlockHash,blockHash);
-
-  bitcoin.createNewTransaction(12.5,"00",nodeAddress);
-  res.json({
-    note:"New Block Mined Successfuly",
-    block: newblock
+  const requestPromises = [];
+  bitcoin.networkNodes.forEach(networkNodeURL=>{
+    const requestOptions = {
+      uri: networkNodeURL + '/recieve-new-block',
+      method: 'POST',
+      body: {newBlock: newblock},
+      json: true
+    };
+    requestPromises.push(rp(requestOptions));
   });
+  //console.log(`Request promises are ${requestPromises}`)
+  Promise.all(requestPromises)
+  .then(data=>{
+    const requestOptions = {
+      uri: bitcoin.currentNodeURL + '/transaction/broadcast',
+      method:'POST',
+      body: {
+        amount:12.5,
+        sender:"00",
+        recipient: nodeAddress
+      },
+      json: true
+    };
+    return rp(requestOptions);
+  })
+  .then(data=>{
+    res.json({
+      note:"New Block Mined and broadcasted Successfuly",
+      block: newblock
+    });
+  })
+  .catch(err=>{
+    console.log(err);
+  });
+
 });
 
+app.post('/recieve-new-block',(req,res)=>{
+  const newBlock = req.boy.newBlock;
+  const lastBlock = bitcoin.getLastBlock();
+  if(lastBlock.hash === newBlock.previousBlockHash
+    && lastBlock['index'] + 1 === newBlock[index]) {
+      bitcoin.chain.push(newBlock);
+      bitcoin.pendingTransactions = [];
+      res.json({
+        note: 'New Block recieved and accepted',
+        newBlock : newBlock
+      });
+    } else {
+      res.json({
+        note: 'New Block rejected'
+      });
+    }
+});
 app.post('/register-and-broadcast-node',(req,res)=>{
   const newNodeURL = req.body.newNodeURL;
   console.log(newNodeURL);
