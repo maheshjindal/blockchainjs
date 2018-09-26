@@ -122,6 +122,49 @@ app.post('/recieve-new-block',(req,res)=>{
       });
     }
 });
+
+app.get('/consensus',(req,res)=>{
+  let requestOptions = [];
+  bitcoin.networkNodes.forEach((networkNodeURL)=>{
+    const requestOptions = {
+      uri: networkNodeURL+'/blockchain',
+      method:'GET',
+      json:true
+    };
+    requestPromises.push(rp(requestOptions));
+  });
+  Promise.all(requestPromises)
+  .then(blockchains=>{
+    const currentChainLength = bitcoin.chain.length;
+    let maxChainLength = currentChainLength;
+    let newLongestChain = null;
+    let newPendingTransactions = null;
+    blockchains.forEach(blockchain=>{
+      if blockchain.chain.length > maxChainLength {
+        maxChainLength = blockchain.chain.length;
+        newLongestChain = blockchain.chain;
+        newPendingTransactions = blockchain.pendingTransactions;
+      };
+    });
+    if(!newLongestChain || (newLongestChain && !(bitcoin.chainIsValid(newLongestChain)))) {
+      res.json({
+        note: 'Current chain has not been relaced':
+        chain: bitcoin.chain;
+      });
+    }else if (newLongestChain && bitcoin.chainIsValid(newLongestChain)) {
+      bitcoin.chain = newLongestChain;
+      bitcoin.pendingTransactions = newPendingTransactions;
+      res.json({
+        note:"This chain has been replaced",
+        chain: bitcoin.chain
+      });
+    }
+  })
+  .catch(err=>{
+    console.log(err);
+  });
+});
+
 app.post('/register-and-broadcast-node',(req,res)=>{
   const newNodeURL = req.body.newNodeURL;
   console.log(newNodeURL);
