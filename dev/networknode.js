@@ -140,7 +140,7 @@ app.get('/consensus',(req,res)=>{
     let newLongestChain = null;
     let newPendingTransactions = null;
     blockchains.forEach(blockchain=>{
-      if blockchain.chain.length > maxChainLength {
+      if (blockchain.chain.length > maxChainLength) {
         maxChainLength = blockchain.chain.length;
         newLongestChain = blockchain.chain;
         newPendingTransactions = blockchain.pendingTransactions;
@@ -148,8 +148,8 @@ app.get('/consensus',(req,res)=>{
     });
     if(!newLongestChain || (newLongestChain && !(bitcoin.chainIsValid(newLongestChain)))) {
       res.json({
-        note: 'Current chain has not been relaced':
-        chain: bitcoin.chain;
+        note: 'Current chain has not been relaced',
+        chain: bitcoin.chain
       });
     }else if (newLongestChain && bitcoin.chainIsValid(newLongestChain)) {
       bitcoin.chain = newLongestChain;
