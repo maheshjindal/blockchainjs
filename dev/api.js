@@ -22,7 +22,7 @@ app.post('/transaction',(req,res)=>{
   });
 
 
-app.get('/mine',(req,res)=>{
+app.get('/mine',(req,res) => {
   const lastBlock = bitcoin.getLastBlock();
   const prevBlockHash = lastBlock["hash"];
   const currBlockData = {

@@ -1,11 +1,14 @@
 const sha256 = require('sha256');
-
+const currentnodeURL = process.argv[3];
 class Blockchain {
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
+    this.networkNodes = [];
+    this.currentNodeURL = currentnodeURL;
     this.createNewBlock(100,'0','0');
   }
+
   createNewBlock(nonce, previousBlockHash, hash) {
     const newBlock = {
         index: this.chain.length + 1,
@@ -19,9 +22,11 @@ class Blockchain {
       this.chain.push(newBlock);
       return newBlock;
   }
+
   getLastBlock() {
     return this.chain[this.chain.length - 1]
   }
+
   createNewTransaction(amount, sender, recipient) {
     const newTransaction = {
       amount: amount,
@@ -32,11 +37,14 @@ class Blockchain {
     return (this.getLastBlock()["index"]+1);
   }
 
+
   hashBlock(previousBlockHash, currentBlockData, nonce) {
     const newDataString = previousBlockHash+nonce.toString()+JSON.stringify(currentBlockData);
     const hash = sha256(newDataString);
     return hash;
   }
+
+
   proofOfWork(previousBlockHash, currentBlockData) {
     let nonce = 0;
     let hash = this.hashBlock(previousBlockHash,currentBlockData, nonce);
