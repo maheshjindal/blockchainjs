@@ -195,7 +195,7 @@ app.post('/register-and-broadcast-node',(req,res)=>{
 
   })
   .then(data=>{
-    return res.json({note: 'New node registered with network successfully'});
+    res.json({note: 'New node registered with network successfully'});
   })
   .catch((err)=>{
     console.log("err");
